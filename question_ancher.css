@@ -1,0 +1,61 @@
+/* ==UserStyle==
+@name           ChatGPT – 问题锚点导航 (rev 2‑2025‑06‑11)
+@namespace      https://chatgpt.com
+@version        1.1.0
+@description    Numbers every user question in the ChatGPT UI (chat.openai.com / chatgpt.com) and optionally displays a floating index. Uses modern :has() to detect user bubbles accurately after the June 2025 DOM update.
+@author         夏越
+==/UserStyle== */
+
+/* ─────────────  Scope  ───────────── */
+@-moz-document domain("chatgpt.com") {
+  /* ——1. 为聊天内容区（flex-1）添加右外边距——
+     这里 .flex-row > .flex-1 正好匹配到 DOM 中的第二个子 div（绿色区域） */
+  .flex-row > .flex-1 {
+    margin-right: 360px !important;
+  }
+
+  /* ——2. 侧边栏本身保持固定—— */
+  #__chatgpt-anchor-nav {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 360px;
+    background: #f9f9f9;
+    border-left: 1px solid #ccc;
+    padding: 12px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    z-index: 9999;
+  }
+
+  /* ——3. 列表、搜索框依旧垂直排列—— */
+  #__chatgpt-anchor-search-container {
+    display: flex; /* 使内部元素水平排列 */
+    align-items: center; /* 垂直居中对齐 */
+    margin-bottom: 10px;
+  }
+
+  #__chatgpt-anchor-search {
+    /* display: block; */ /* 移除 block，因为它现在是 flex item */
+    flex-grow: 1; /* 让搜索框占据多余空间 */
+    /* width: 100%; */ /* 移除 width，由 flex-grow 控制 */
+    /* margin-bottom: 10px; */ /* 移动到父容器 __chatgpt-anchor-search-container */
+    margin-right: 8px; /* 在搜索框和按钮之间添加一些间距 */
+  }
+
+  #__chatgpt-anchor-refresh-btn {
+    cursor: pointer;
+    padding: 4px; /* 调整内边距使图标看起来更好 */
+    font-size: 1.2em; /* 可以调整图标大小 */
+    user-select: none; /* 防止文本选中 */
+  }
+
+  #__chatgpt-anchor-list a {
+    display: block;
+    margin: 4px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
