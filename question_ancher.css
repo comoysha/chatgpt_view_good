@@ -1,15 +1,14 @@
 /* ==UserStyle==
-@name           ChatGPT – 问题锚点导航 (rev 2‑2025‑06‑11)
+@name           ChatGPT – 问题锚点导航 (rev 2-2025-06-11)
 @namespace      https://chatgpt.com
-@version        1.1.0
-@description    Numbers every user question in the ChatGPT UI (chat.openai.com / chatgpt.com) and optionally displays a floating index. Uses modern :has() to detect user bubbles accurately after the June 2025 DOM update.
+@version        1.1.1
+@description    Numbers every user question and supports light/dark mode on chat.openai.com / chatgpt.com.
 @author         夏越
 ==/UserStyle== */
 
 /* ─────────────  Scope  ───────────── */
 @-moz-document domain("chatgpt.com") {
-  /* ——1. 为聊天内容区（flex-1）添加右外边距——
-     这里 .flex-row > .flex-1 正好匹配到 DOM 中的第二个子 div（绿色区域） */
+  /* ——1. 为聊天内容区（flex-1）添加右外边距—— */
   .flex-row > .flex-1 {
     margin-right: 360px !important;
   }
@@ -27,6 +26,7 @@
     box-sizing: border-box;
     overflow-y: auto;
     z-index: 9999;
+    color: #333;
   }
 
   /* ——3. 列表、搜索框依旧垂直排列—— */
@@ -37,18 +37,21 @@
   }
 
   #__chatgpt-anchor-search {
-    /* display: block; */ /* 移除 block，因为它现在是 flex item */
-    flex-grow: 1; /* 让搜索框占据多余空间 */
-    /* width: 100%; */ /* 移除 width，由 flex-grow 控制 */
-    /* margin-bottom: 10px; */ /* 移动到父容器 __chatgpt-anchor-search-container */
-    margin-right: 8px; /* 在搜索框和按钮之间添加一些间距 */
+    flex-grow: 1; 
+    margin-right: 8px;
+    background: #fff;
+    border: 1px solid #bbb;
+    color: #333;
+  }
+  #__chatgpt-anchor-search::placeholder {
+    color: #666;
   }
 
   #__chatgpt-anchor-refresh-btn {
     cursor: pointer;
-    padding: 4px; /* 调整内边距使图标看起来更好 */
-    font-size: 1.2em; /* 可以调整图标大小 */
-    user-select: none; /* 防止文本选中 */
+    padding: 4px; 
+    font-size: 1.2em; 
+    user-select: none;
   }
 
   #__chatgpt-anchor-list a {
@@ -57,5 +60,44 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: #333;
+  }
+
+  /* ——4. 深色模式—— */
+  @media (prefers-color-scheme: dark) {
+    #__chatgpt-anchor-nav {
+      background: #2b2b2b;
+      border-left: 1px solid #444;
+      color: #ddd;
+    }
+    #__chatgpt-anchor-search {
+      background: #3c3c3c;
+      border: 1px solid #555;
+      color: #eee;
+    }
+    #__chatgpt-anchor-search::placeholder {
+      color: #aaa;
+    }
+    #__chatgpt-anchor-list a {
+      color: #eee;
+    }
+  }
+
+  /* ——5. 兼容 ChatGPT 自带深色类（html.dark）—— */
+  html.dark #__chatgpt-anchor-nav {
+    background: #2b2b2b !important;
+    border-left: 1px solid #444 !important;
+    color: #ddd !important;
+  }
+  html.dark #__chatgpt-anchor-search {
+    background: #3c3c3c !important;
+    border: 1px solid #555 !important;
+    color: #eee !important;
+  }
+  html.dark #__chatgpt-anchor-search::placeholder {
+    color: #aaa !important;
+  }
+  html.dark #__chatgpt-anchor-list a {
+    color: #eee !important;
   }
 }
