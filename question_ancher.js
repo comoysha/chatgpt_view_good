@@ -27,10 +27,11 @@
   
     const listContainer = nav.querySelector('#__chatgpt-anchor-list');
     const searchInput   = nav.querySelector('#__chatgpt-anchor-search');
-    const refreshButton = nav.querySelector('#__chatgpt-anchor-refresh-btn'); // Get the refresh button
+    const refreshButton = nav.querySelector('#__chatgpt-anchor-refresh-btn');
   
     // —— 3. 核心功能 —— 
     let detailObserver = null;  // 当前会话的 MutationObserver
+    let autoRefreshTimer = null; // 自动刷新定时器
   
     /** 等待 DETAIL_SELECTOR 出现 **/
     function waitFor(selector, timeout = 10000) {
@@ -82,6 +83,26 @@
       filterList();
     }
   
+    /** 启动自动刷新定时器 **/
+    function startAutoRefresh() {
+      // 清除现有定时器
+      if (autoRefreshTimer) {
+        clearInterval(autoRefreshTimer);
+      }
+      // 设置15秒间隔的自动刷新
+      autoRefreshTimer = setInterval(() => {
+        rebuildList();
+      }, 15000); // 15秒 = 15000毫秒
+    }
+  
+    /** 停止自动刷新定时器 **/
+    function stopAutoRefresh() {
+      if (autoRefreshTimer) {
+        clearInterval(autoRefreshTimer);
+        autoRefreshTimer = null;
+      }
+    }
+  
     /** 新消息到来时增量追加 **/
     function handleMutations(muts) {
       for (const m of muts) {
@@ -103,21 +124,32 @@
       }
     }
     searchInput.addEventListener('input', filterList);
-    refreshButton.addEventListener('click', rebuildList); // Add click listener to refresh button
+    refreshButton.addEventListener('click', rebuildList);
   
     /** 初始化当前会话：等待详情区 → 绑定 observer → 初始化构建 **/
     function initForCurrentSession() {
       // 断开旧 observer
       if (detailObserver) detailObserver.disconnect();
+      // 停止旧的自动刷新定时器
+      stopAutoRefresh();
   
       waitFor(DETAIL_SELECTOR).then(el => {
-        // 绑定新的 MutationObserver 监听“新消息”
+        // 绑定新的 MutationObserver 监听"新消息"
         detailObserver = new MutationObserver(handleMutations);
         detailObserver.observe(el, { childList: true, subtree: true });
   
         // 构建历史列表
         rebuildList();
-      }).catch(err => console.error('Init Error:', err));
+        // 启动自动刷新
+        startAutoRefresh();
+      }).catch(err => {
+        console.error('ChatGPT Anchor Init Error:', err);
+        // 即使找不到详情区域，也尝试启动自动刷新
+        setTimeout(() => {
+          rebuildList();
+          startAutoRefresh();
+        }, 2000);
+      });
     }
   
     // —— 4. 监听 SPA URL 切换 —— 
