@@ -1,0 +1,70 @@
+(function() {
+    // 分析页面结构并输出关键信息
+    console.log('===== ChatGPT页面结构分析 =====');
+    
+    // 1. 检查主内容区域
+    const mainContent = document.querySelector('.relative.flex.h-full.max-w-full.flex-1.flex-col');
+    console.log('主内容区域:', {
+        element: mainContent,
+        width: mainContent ? getComputedStyle(mainContent).width : 'not found',
+        marginRight: mainContent ? getComputedStyle(mainContent).marginRight : 'not found',
+        selector: '.relative.flex.h-full.max-w-full.flex-1.flex-col'
+    });
+    
+    // 2. 检查侧边栏
+    const sidebar = document.getElementById('__chatgpt-anchor-nav');
+    console.log('侧边栏:', {
+        element: sidebar,
+        width: sidebar ? getComputedStyle(sidebar).width : 'not found',
+        right: sidebar ? getComputedStyle(sidebar).right : 'not found',
+        visibility: sidebar ? (sidebar.classList.contains('visible') ? '可见' : '隐藏') : 'not found'
+    });
+    
+    // 3. 检查聊天容器
+    const chatContainer = document.querySelector('[class*="max-w-"]');
+    console.log('聊天容器:', {
+        element: chatContainer,
+        width: chatContainer ? getComputedStyle(chatContainer).width : 'not found',
+        maxWidth: chatContainer ? getComputedStyle(chatContainer).maxWidth : 'not found'
+    });
+    
+    // 4. 检查body类
+    console.log('Body类:', {
+        hasSidebarVisibleClass: document.body.classList.contains('sidebar-visible')
+    });
+    
+    // 5. 列出所有可能的主内容选择器
+    console.log('可能的主内容选择器:');
+    const possibleSelectors = [
+        '.relative.flex.h-full.max-w-full.flex-1.flex-col',
+        '.flex-1.overflow-hidden',
+        '.flex.flex-col.w-full.h-full',
+        '.flex.h-full.flex-col',
+        'main'
+    ];
+    
+    possibleSelectors.forEach(selector => {
+        const el = document.querySelector(selector);
+        if (el) {
+            console.log(`选择器 ${selector}:`, {
+                element: el,
+                width: getComputedStyle(el).width,
+                marginRight: getComputedStyle(el).marginRight
+            });
+        }
+    });
+    
+    // 6. 分析页面宽度控制
+    console.log('页面宽度控制元素:');
+    document.querySelectorAll('[class*="max-w-"]').forEach(el => {
+        console.log(`元素:`, {
+            element: el,
+            class: el.className,
+            width: getComputedStyle(el).width,
+            maxWidth: getComputedStyle(el).maxWidth
+        });
+    });
+    
+    console.log('===== 分析完成 =====');
+    console.log('请将这些信息截图或复制给AI助手，以便更好地解决侧边栏问题');
+})();

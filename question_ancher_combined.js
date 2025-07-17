@@ -20,17 +20,28 @@
             max-width: 100% !important;
         }
 
-
-        /* 为聊天内容区添加右外边距 */
-        .relative.flex.h-full.max-w-full.flex-1.flex-col {
+        /* 强制重置所有可能的主内容区域 - 使用更强的选择器 */
+        div.relative.flex.h-full.max-w-full.flex-1.flex-col,
+        div[class*="relative"][class*="flex"][class*="h-full"][class*="max-w-full"][class*="flex-1"][class*="flex-col"],
+        .max-xs\:\[--force-hide-label\:none\].relative.z-1.flex.h-full.max-w-full.flex-1.flex-col {
+            width: 100% !important;
+            margin-right: 0px !important;
+            padding-right: 0px !important;
+            transition: width 0.3s ease, margin-right 0.3s ease !important;
+        }
+        
+        /* 当侧边栏可见时，为主内容区域添加右边距 */
+        body.sidebar-visible div.relative.flex.h-full.max-w-full.flex-1.flex-col,
+        body.sidebar-visible div[class*="relative"][class*="flex"][class*="h-full"][class*="max-w-full"][class*="flex-1"][class*="flex-col"],
+        body.sidebar-visible .max-xs\:\[--force-hide-label\:none\].relative.z-1.flex.h-full.max-w-full.flex-1.flex-col {
             margin-right: 360px !important;
         }
         
-        /* 侧边栏本身保持固定 */
+        /* 侧边栏本身保持固定，但默认隐藏 */
         #__chatgpt-anchor-nav {
             position: fixed;
             top: 0;
-            right: 0;
+            right: -360px; /* 默认隐藏 */
             bottom: 0;
             width: 360px;
             background: #f9f9f9;
@@ -40,6 +51,36 @@
             overflow-y: auto;
             z-index: 9999;
             color: #333;
+            transition: right 0.3s ease;
+        }
+        
+        /* 侧边栏可见状态 */
+        #__chatgpt-anchor-nav.visible {
+            right: 0;
+        }
+        
+        /* 悬浮按钮样式 */
+        #__chatgpt-anchor-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #10a37f; /* ChatGPT绿色 */
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 10000;
+            font-size: 20px;
+            transition: transform 0.2s ease;
+        }
+        
+        #__chatgpt-anchor-toggle:hover {
+            transform: scale(1.05);
         }
         
         /* 列表、搜索框依旧垂直排列 */
@@ -95,6 +136,9 @@
             #__chatgpt-anchor-list a {
                 color: #eee;
             }
+            #__chatgpt-anchor-toggle {
+                background: #19c37d; /* 深色模式下稍亮一点 */
+            }
         }
         
         /* 兼容 ChatGPT 自带深色类（html.dark） */
@@ -113,6 +157,9 @@
         }
         html.dark #__chatgpt-anchor-list a {
             color: #eee !important;
+        }
+        html.dark #__chatgpt-anchor-toggle {
+            background: #19c37d !important;
         }
     `);
     
@@ -138,7 +185,8 @@
         // 侧边栏配置
         SIDEBAR: {
             ID: '__chatgpt-anchor-nav',
-            WIDTH: '360px'
+            WIDTH: '360px',
+            TOGGLE_ID: '__chatgpt-anchor-toggle'
         }
     };
     // ========== 配置区域结束 ==========
@@ -155,9 +203,53 @@
     `;
     document.body.appendChild(nav);
   
+    // 创建悬浮按钮
+    const toggleBtn = document.createElement('div');
+    toggleBtn.id = SELECTORS.SIDEBAR.TOGGLE_ID;
+    toggleBtn.innerHTML = '📋';
+    toggleBtn.title = '显示/隐藏问题侧边栏';
+    document.body.appendChild(toggleBtn);
+  
     const listContainer = nav.querySelector('#__chatgpt-anchor-list');
     const searchInput   = nav.querySelector('#__chatgpt-anchor-search');
     const refreshButton = nav.querySelector('#__chatgpt-anchor-refresh-btn');
+  
+    // 侧边栏显示/隐藏状态
+    let sidebarVisible = false;
+  
+    // 切换侧边栏显示/隐藏
+    function toggleSidebar() {
+      sidebarVisible = !sidebarVisible;
+      
+      if (sidebarVisible) {
+        nav.classList.add('visible');
+        document.body.classList.add('sidebar-visible');
+      } else {
+        nav.classList.remove('visible');
+        document.body.classList.remove('sidebar-visible');
+      }
+      
+      // 强制刷新样式 - 直接操作DOM元素
+      const mainElements = document.querySelectorAll('.relative.flex.h-full.max-w-full.flex-1.flex-col');
+      mainElements.forEach(el => {
+        if (sidebarVisible) {
+          el.style.marginRight = '360px';
+        } else {
+          el.style.marginRight = '0px';
+        }
+      });
+    }
+  
+    // 绑定按钮点击事件
+    toggleBtn.addEventListener('click', toggleSidebar);
+  
+    // 初始化时确保侧边栏隐藏
+    document.addEventListener('DOMContentLoaded', function() {
+      const mainElements = document.querySelectorAll('.relative.flex.h-full.max-w-full.flex-1.flex-col');
+      mainElements.forEach(el => {
+        el.style.marginRight = '0px';
+      });
+    });
   
     // —— 3. 核心功能 —— 
     let detailObserver = null;
