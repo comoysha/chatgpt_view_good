@@ -13,10 +13,54 @@
     // ========== CSS 样式注入 ==========
     GM_addStyle(`
 
-        /* 解除 ChatGPT 对话栏宽度限制 */
+        /* 解除 ChatGPT 对话栏宽度限制 - 增强版 */
         [class*="max-w-"],
         .lg\:max-w-4xl,
-        .max-w-3xl {
+        .max-w-3xl,
+        .max-w-2xl,
+        .max-w-xl,
+        .max-w-lg,
+        .max-w-md,
+        .max-w-sm,
+        .max-w-xs,
+        .max-w-none,
+        .max-w-full,
+        .max-w-screen-sm,
+        .max-w-screen-md,
+        .max-w-screen-lg,
+        .max-w-screen-xl,
+        .max-w-screen-2xl,
+        div[class*="max-w-"],
+        main[class*="max-w-"],
+        section[class*="max-w-"],
+        article[class*="max-w-"],
+        .prose,
+        .prose-sm,
+        .prose-lg,
+        .prose-xl,
+        .prose-2xl {
+            max-width: 100% !important;
+            width: 100% !important;
+        }
+        
+        /* 特别针对ChatGPT的对话容器 */
+        main > div,
+        main > div > div,
+        main > div > div > div,
+        [role="main"] > div,
+        [role="main"] > div > div,
+        [role="main"] > div > div > div {
+            max-width: 100% !important;
+            width: 100% !important;
+        }
+        
+        /* 针对具体的对话内容容器 */
+        .text-base,
+        .markdown,
+        .prose,
+        div[class*="prose"],
+        div[class*="text-"],
+        .whitespace-pre-wrap {
             max-width: 100% !important;
         }
 
