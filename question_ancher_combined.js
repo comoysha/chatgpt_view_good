@@ -79,6 +79,7 @@
             background: #fff;
             border: 1px solid #bbb;
             color: #333;
+            border-radius: 14px;     /* 设置圆角边框，半径14px */
         }
 
         #__chatgpt-anchor-search::placeholder {
@@ -93,13 +94,16 @@
         }
 
         #__chatgpt-anchor-list a {
-            display: block;
-            margin: 4px 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            color: #333;
+            display: block !important;          /* 将链接显示为块级元素 */
+            margin: 8px 0 !important;          /* 上下外边距8px，左右无外边距 */
+            padding: 4px 0 !important;         /* 增加内边距让间距更明显 */
+            white-space: normal !important;     /* 文本允许换行 */
+            overflow: visible !important;       /* 超出部分显示 */
+            color: #333;                        /* 文本颜色设置为深灰色 */
+            line-height: 1.4 !important;       /* 设置行高，改善可读性 */
         }
+
+        
 
         /* 深色模式 */
         @media (prefers-color-scheme: dark) {
@@ -120,7 +124,7 @@
                 color: #eee;
             }
             #__chatgpt-anchor-toggle {
-                background: #19c37d; /* 深色模式下稍亮一点 */
+                background: #F5F5F5; /* 深色模式下稍亮一点 */
             }
         }
 
@@ -142,7 +146,7 @@
             color: #eee !important;
         }
         html.dark #__chatgpt-anchor-toggle {
-            background: #19c37d !important;
+            background: #3d3d3d !important;
         }
     `);
 
@@ -282,7 +286,7 @@
         }
 
         let fullText = txtEl ? txtEl.textContent.trim().replace(/\s+/g,' ') : '';
-        const preview = fullText.length > 20 ? fullText.slice(0,20) + '…' : fullText;
+        const preview = fullText.length > 50 ? fullText.slice(0,50) + '…' : fullText;
 
         const a = document.createElement('a');
         a.href        = `#${id}`;
