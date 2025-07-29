@@ -101,21 +101,31 @@
             overflow: visible !important;       /* 超出部分显示 */
             color: #333;                        /* 文本颜色设置为深灰色 */
             line-height: 1.4 !important;       /* 设置行高，改善可读性 */
+            text-decoration: none !important;   /* 移除下划线 */
+            border-radius: 6px !important;      /* 圆角边框 */
+            padding: 8px 12px !important;       /* 增加左右内边距 */
+            transition: all 0.2s ease !important; /* 平滑过渡效果 */
         }
-        
+
         /* hover效果 */
         #__chatgpt-anchor-list a:hover {
             background-color: #f0f0f0 !important;
             color: #000 !important;
+            transform: translateX(4px) !important; /* 轻微向右移动 */
         }
 
-        /* 持久选中状态 */
+        /* 选中效果 */
         #__chatgpt-anchor-list a.current {
             background-color: #e3f2fd !important;
             color: #1976d2 !important;
-            border-left: 3px solid #1976d2;
-            padding-left: 8px !important;
-            font-weight: 500;
+            border-left: 3px solid #1976d2 !important;
+            font-weight: 500 !important;
+        }
+
+        /* 选中状态的hover效果 */
+        #__chatgpt-anchor-list a.current:hover {
+            background-color: #bbdefb !important;
+            transform: none !important; /* 选中状态不移动 */
         }
 
         /* 深色模式 */
@@ -133,7 +143,7 @@
             #__chatgpt-anchor-search::placeholder {
                 color: #aaa;
             }
-            #__chatgpt-anchor-list a {
+                        #__chatgpt-anchor-list a {
                 color: #eee;
             }
             #__chatgpt-anchor-list a:hover {
@@ -143,8 +153,10 @@
             #__chatgpt-anchor-list a.current {
                 background-color: #1e3a8a !important;
                 color: #60a5fa !important;
-                border-left: 3px solid #60a5fa;
-                font-weight: 500;
+                border-left: 3px solid #60a5fa !important;
+            }
+            #__chatgpt-anchor-list a.current:hover {
+                background-color: #1e40af !important;
             }
             #__chatgpt-anchor-toggle {
                 background: #F5F5F5; /* 深色模式下稍亮一点 */
@@ -168,6 +180,7 @@
         html.dark #__chatgpt-anchor-list a {
             color: #eee !important;
         }
+
         html.dark #__chatgpt-anchor-list a:hover {
             background-color: #404040 !important;
             color: #fff !important;
@@ -175,8 +188,10 @@
         html.dark #__chatgpt-anchor-list a.current {
             background-color: #1e3a8a !important;
             color: #60a5fa !important;
-            border-left: 3px solid #60a5fa;
-            font-weight: 500;
+            border-left: 3px solid #60a5fa !important;
+        }
+        html.dark #__chatgpt-anchor-list a.current:hover {
+            background-color: #1e40af !important;
         }
         html.dark #__chatgpt-anchor-toggle {
             background: #3d3d3d !important;
@@ -326,11 +341,33 @@
         a.textContent = `${idx+1}. ${preview}`;
         a.title       = fullText;
         a.tabIndex    = 0;
+        
+        // 添加点击事件处理选中状态
+        a.addEventListener('click', function(e) {
+            e.preventDefault(); // 阻止默认跳转行为
+            
+            // 移除所有其他项的current类
+            document.querySelectorAll('#__chatgpt-anchor-list a.current').forEach(item => {
+                item.classList.remove('current');
+            });
+            
+            // 为当前项添加current类
+            this.classList.add('current');
+            
+            // 滚动到对应的元素
+            const targetElement = document.querySelector(this.getAttribute('href'));
+            if (targetElement) {
+                targetElement.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+            }
+        });
+        
         listContainer.appendChild(a);
       });
+      
       filterList();
-      // 检查并更新当前选中状态
-      setTimeout(updateCurrentQuestion, 100);
     }
 
     /** 启动自动刷新定时器 **/
@@ -417,70 +454,5 @@
 
     // —— 5. 首次执行 ——
     initForCurrentSession();
-
-    // —— 6. 滚动监听和自动选中功能 ——
-    let scrollTimeout = null;
-    
-    /** 更新当前选中的问题 **/
-    function updateCurrentQuestion() {
-        const articles = document.querySelectorAll(SELECTORS.ARTICLE_SELECTOR);
-        const links = listContainer.querySelectorAll('a');
-        
-        // 移除所有current类
-        links.forEach(link => link.classList.remove('current'));
-        
-        // 找到当前视窗中最靠近顶部的问题
-        let currentArticle = null;
-        let minDistance = Infinity;
-        
-        articles.forEach((article, index) => {
-            if (index % 2 === 0) { // 只检查用户问题
-                const rect = article.getBoundingClientRect();
-                const distance = Math.abs(rect.top - 100); // 距离顶部100px的位置
-                
-                if (rect.top <= 200 && distance < minDistance) { // 在视窗上半部分
-                    minDistance = distance;
-                    currentArticle = article;
-                }
-            }
-        });
-        
-        // 为对应的链接添加current类
-        if (currentArticle) {
-            const articleId = currentArticle.id;
-            if (articleId) {
-                const correspondingLink = listContainer.querySelector(`a[href="#${articleId}"]`);
-                if (correspondingLink) {
-                    correspondingLink.classList.add('current');
-                }
-            }
-        }
-    }
-    
-    /** 滚动事件监听 **/
-    function handleScroll() {
-        // 使用防抖，避免频繁触发
-        if (scrollTimeout) {
-            clearTimeout(scrollTimeout);
-        }
-        scrollTimeout = setTimeout(updateCurrentQuestion, 100);
-    }
-    
-    /** 点击链接时也更新选中状态 **/
-    function handleLinkClick(event) {
-        // 移除所有current类
-        listContainer.querySelectorAll('a').forEach(link => link.classList.remove('current'));
-        // 为点击的链接添加current类
-        event.target.classList.add('current');
-        
-        // 延迟更新，让滚动完成后再检查
-        setTimeout(updateCurrentQuestion, 500);
-    }
-    
-    // 绑定滚动事件
-    window.addEventListener('scroll', handleScroll);
-    
-    // 为动态生成的链接绑定点击事件
-    listContainer.addEventListener('click', handleLinkClick);
 
 })();
