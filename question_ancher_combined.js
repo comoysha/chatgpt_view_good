@@ -64,7 +64,7 @@
             max-width: 100% !important;
         }
 
-        /* 强制重置所有可能的主内容区域 - 使用更强的选择器 */
+        /* 强制重置所有可能的主内容区域 */
         div.relative.flex.h-full.max-w-full.flex-1.flex-col,
         div[class*="relative"][class*="flex"][class*="h-full"][class*="max-w-full"][class*="flex-1"][class*="flex-col"],
         .max-xs\:\[--force-hide-label\:none\].relative.z-1.flex.h-full.max-w-full.flex-1.flex-col {
@@ -72,6 +72,27 @@
             margin-right: 0px !important;
             padding-right: 0px !important;
             transition: width 0.3s ease, margin-right 0.3s ease !important;
+        }
+
+        /* 当侧边栏可见时，只为主内容区域添加右边距，精确排除底部输入区域 */
+        body.sidebar-visible div.relative.flex.h-full.max-w-full.flex-1.flex-col:not(:has(form[class*="view-transition-name"])):not(:has([data-testid*="composer"])):not(:has(#prompt-textarea)),
+        body.sidebar-visible div[class*="relative"][class*="flex"][class*="h-full"][class*="max-w-full"][class*="flex-1"][class*="flex-col"]:not(:has(form[class*="view-transition-name"])):not(:has([data-testid*="composer"])):not(:has(#prompt-textarea)),
+        body.sidebar-visible .max-xs\:\[--force-hide-label\:none\].relative.z-1.flex.h-full.max-w-full.flex-1.flex-col:not(:has(form[class*="view-transition-name"])):not(:has([data-testid*="composer"])):not(:has(#prompt-textarea)) {
+            margin-right: 360px !important;
+        }
+        
+        /* 精确针对底部输入框相关元素，确保不受影响 */
+        form[class*="view-transition-name"],
+        form[class*="view-transition-name"] *,
+        [data-testid*="composer"],
+        [data-testid*="composer"] *,
+        #prompt-textarea,
+        body.sidebar-visible form[class*="view-transition-name"],
+        body.sidebar-visible form[class*="view-transition-name"] *,
+        body.sidebar-visible [data-testid*="composer"],
+        body.sidebar-visible [data-testid*="composer"] *,
+        body.sidebar-visible #prompt-textarea {
+            margin-right: 0px !important;
         }
         
         /* 当侧边栏可见时，为主内容区域添加右边距 */

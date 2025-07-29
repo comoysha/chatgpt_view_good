@@ -1,0 +1,13 @@
+/* ==UserStyle==
+@name         ChatGPT – full-bleed tables w/ sidebar awareness
+@namespace    https://chatgpt.com/
+@version      1.2.0
+@match        *://chatgpt.com/*
+==/UserStyle== */
+@-moz-document domain("chatgpt.com") {
+    /* 针对可能的响应式容器 */
+    .container[class*="max-w-"],
+    .mx-auto[class*="max-w-"] {
+        max-width: 100% !important;
+    }
+}
