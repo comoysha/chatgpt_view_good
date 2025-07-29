@@ -212,8 +212,8 @@
         document.body.classList.remove('sidebar-visible');
       }
 
-      // 强制刷新样式 - 直接操作DOM元素
-      const mainElements = document.querySelectorAll('.relative.flex.h-full.max-w-full.flex-1.flex-col');
+      // 强制刷新样式 - 直接操作DOM元素，但排除特定的div
+      const mainElements = document.querySelectorAll('.relative.flex.h-full.max-w-full.flex-1.flex-col:not(.max-xs\\:\\[--force-hide-label\\:none\\])');
       mainElements.forEach(el => {
         if (sidebarVisible) {
           el.style.marginRight = '360px';
@@ -228,7 +228,7 @@
 
     // 初始化时确保侧边栏隐藏
     document.addEventListener('DOMContentLoaded', function() {
-      const mainElements = document.querySelectorAll('.relative.flex.h-full.max-w-full.flex-1.flex-col');
+      const mainElements = document.querySelectorAll('.relative.flex.h-full.max-w-full.flex-1.flex-col:not(.max-xs\\:\\[--force-hide-label\\:none\\])');
       mainElements.forEach(el => {
         el.style.marginRight = '0px';
       });
