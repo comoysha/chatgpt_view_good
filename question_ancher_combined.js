@@ -9,99 +9,23 @@
 
 (function() {
     'use strict';
-    
+
     // ========== CSS 样式注入 ==========
     GM_addStyle(`
 
-        /* 解除 ChatGPT 对话栏宽度限制 - 增强版 */
-        [class*="max-w-"],
-        .lg\:max-w-4xl,
-        .max-w-3xl,
-        .max-w-2xl,
-        .max-w-xl,
-        .max-w-lg,
-        .max-w-md,
-        .max-w-sm,
-        .max-w-xs,
-        .max-w-none,
-        .max-w-full,
-        .max-w-screen-sm,
-        .max-w-screen-md,
-        .max-w-screen-lg,
-        .max-w-screen-xl,
-        .max-w-screen-2xl,
-        div[class*="max-w-"],
-        main[class*="max-w-"],
-        section[class*="max-w-"],
-        article[class*="max-w-"],
-        .prose,
-        .prose-sm,
-        .prose-lg,
-        .prose-xl,
-        .prose-2xl {
-            max-width: 100% !important;
-            width: 100% !important;
-        }
-        
-        /* 特别针对ChatGPT的对话容器 */
-        main > div,
-        main > div > div,
-        main > div > div > div,
-        [role="main"] > div,
-        [role="main"] > div > div,
-        [role="main"] > div > div > div {
-            max-width: 100% !important;
-            width: 100% !important;
-        }
-        
-        /* 针对具体的对话内容容器 */
-        .text-base,
-        .markdown,
-        .prose,
-        div[class*="prose"],
-        div[class*="text-"],
-        .whitespace-pre-wrap {
-            max-width: 100% !important;
+        /* 针对可能的响应式容器 */
+        .container[class*="max-w-"],
+        .mx-auto[class*="max-w-"] {
+        max-width: 100% !important;
         }
 
-        /* 强制重置所有可能的主内容区域 */
-        div.relative.flex.h-full.max-w-full.flex-1.flex-col,
-        div[class*="relative"][class*="flex"][class*="h-full"][class*="max-w-full"][class*="flex-1"][class*="flex-col"],
-        .max-xs\:\[--force-hide-label\:none\].relative.z-1.flex.h-full.max-w-full.flex-1.flex-col {
-            width: 100% !important;
-            margin-right: 0px !important;
-            padding-right: 0px !important;
-            transition: width 0.3s ease, margin-right 0.3s ease !important;
-        }
-
-        /* 当侧边栏可见时，只为主内容区域添加右边距，精确排除底部输入区域 */
-        body.sidebar-visible div.relative.flex.h-full.max-w-full.flex-1.flex-col:not(:has(form[class*="view-transition-name"])):not(:has([data-testid*="composer"])):not(:has(#prompt-textarea)),
-        body.sidebar-visible div[class*="relative"][class*="flex"][class*="h-full"][class*="max-w-full"][class*="flex-1"][class*="flex-col"]:not(:has(form[class*="view-transition-name"])):not(:has([data-testid*="composer"])):not(:has(#prompt-textarea)),
-        body.sidebar-visible .max-xs\:\[--force-hide-label\:none\].relative.z-1.flex.h-full.max-w-full.flex-1.flex-col:not(:has(form[class*="view-transition-name"])):not(:has([data-testid*="composer"])):not(:has(#prompt-textarea)) {
-            margin-right: 360px !important;
-        }
-        
-        /* 精确针对底部输入框相关元素，确保不受影响 */
-        form[class*="view-transition-name"],
-        form[class*="view-transition-name"] *,
-        [data-testid*="composer"],
-        [data-testid*="composer"] *,
-        #prompt-textarea,
-        body.sidebar-visible form[class*="view-transition-name"],
-        body.sidebar-visible form[class*="view-transition-name"] *,
-        body.sidebar-visible [data-testid*="composer"],
-        body.sidebar-visible [data-testid*="composer"] *,
-        body.sidebar-visible #prompt-textarea {
-            margin-right: 0px !important;
-        }
-        
         /* 当侧边栏可见时，为主内容区域添加右边距 */
         body.sidebar-visible div.relative.flex.h-full.max-w-full.flex-1.flex-col,
         body.sidebar-visible div[class*="relative"][class*="flex"][class*="h-full"][class*="max-w-full"][class*="flex-1"][class*="flex-col"],
         body.sidebar-visible .max-xs\:\[--force-hide-label\:none\].relative.z-1.flex.h-full.max-w-full.flex-1.flex-col {
             margin-right: 360px !important;
         }
-        
+
         /* 侧边栏本身保持固定，但默认隐藏 */
         #__chatgpt-anchor-nav {
             position: fixed;
@@ -118,16 +42,16 @@
             color: #333;
             transition: right 0.3s ease;
         }
-        
+
         /* 侧边栏可见状态 */
         #__chatgpt-anchor-nav.visible {
             right: 0;
         }
-        
+
         /* 悬浮按钮样式 */
         #__chatgpt-anchor-toggle {
             position: fixed;
-            bottom: 20px;
+            bottom: 100px;
             right: 20px;
             width: 50px;
             height: 50px;
@@ -143,18 +67,18 @@
             font-size: 20px;
             transition: transform 0.2s ease;
         }
-        
+
         #__chatgpt-anchor-toggle:hover {
             transform: scale(1.05);
         }
-        
+
         /* 列表、搜索框依旧垂直排列 */
         #__chatgpt-anchor-search-container {
             display: flex;
             align-items: center;
             margin-bottom: 10px;
         }
-        
+
         #__chatgpt-anchor-search {
             flex-grow: 1;
             margin-right: 8px;
@@ -162,18 +86,18 @@
             border: 1px solid #bbb;
             color: #333;
         }
-        
+
         #__chatgpt-anchor-search::placeholder {
             color: #666;
         }
-        
+
         #__chatgpt-anchor-refresh-btn {
             cursor: pointer;
             padding: 4px;
             font-size: 1.2em;
             user-select: none;
         }
-        
+
         #__chatgpt-anchor-list a {
             display: block;
             margin: 4px 0;
@@ -182,7 +106,7 @@
             text-overflow: ellipsis;
             color: #333;
         }
-        
+
         /* 深色模式 */
         @media (prefers-color-scheme: dark) {
             #__chatgpt-anchor-nav {
@@ -205,7 +129,7 @@
                 background: #19c37d; /* 深色模式下稍亮一点 */
             }
         }
-        
+
         /* 兼容 ChatGPT 自带深色类（html.dark） */
         html.dark #__chatgpt-anchor-nav {
             background: #2b2b2b !important;
@@ -227,26 +151,26 @@
             background: #19c37d !important;
         }
     `);
-    
+
     // ========== 配置区域 ==========
     // 当 ChatGPT 界面更新时，只需要修改这个配置对象
     const SELECTORS = {
         // 聊天容器选择器（用于添加右边距）
         CHAT_CONTAINER: ".relative.flex.h-full.max-w-full.flex-1.flex-col",
-        
+
         // 详情区域选择器（用于监听新消息）
         DETAIL_CONTAINER: ".relative.flex.h-full.max-w-full.flex-1.flex-col",
-        
+
         // 对话文章选择器（用于提取用户问题）
         ARTICLE_SELECTOR: "article.text-token-text-primary.w-full",
-        
+
         // 用户消息文本选择器（按优先级排序）
         TEXT_SELECTORS: [
             '[data-message-author-role="user"]',
             '.whitespace-pre-wrap',
             'div[dir="auto"]'
         ],
-        
+
         // 侧边栏配置
         SIDEBAR: {
             ID: '__chatgpt-anchor-nav',
@@ -255,8 +179,8 @@
         }
     };
     // ========== 配置区域结束 ==========
-  
-    // —— 2. 侧边栏初始化 —— 
+
+    // —— 2. 侧边栏初始化 ——
     const nav = document.createElement('div');
     nav.id = SELECTORS.SIDEBAR.ID;
     nav.innerHTML = `
@@ -267,25 +191,25 @@
       <div id="__chatgpt-anchor-list"></div>
     `;
     document.body.appendChild(nav);
-  
+
     // 创建悬浮按钮
     const toggleBtn = document.createElement('div');
     toggleBtn.id = SELECTORS.SIDEBAR.TOGGLE_ID;
     toggleBtn.innerHTML = '📋';
     toggleBtn.title = '显示/隐藏问题侧边栏';
     document.body.appendChild(toggleBtn);
-  
+
     const listContainer = nav.querySelector('#__chatgpt-anchor-list');
     const searchInput   = nav.querySelector('#__chatgpt-anchor-search');
     const refreshButton = nav.querySelector('#__chatgpt-anchor-refresh-btn');
-  
+
     // 侧边栏显示/隐藏状态
     let sidebarVisible = false;
-  
+
     // 切换侧边栏显示/隐藏
     function toggleSidebar() {
       sidebarVisible = !sidebarVisible;
-      
+
       if (sidebarVisible) {
         nav.classList.add('visible');
         document.body.classList.add('sidebar-visible');
@@ -293,7 +217,7 @@
         nav.classList.remove('visible');
         document.body.classList.remove('sidebar-visible');
       }
-      
+
       // 强制刷新样式 - 直接操作DOM元素
       const mainElements = document.querySelectorAll('.relative.flex.h-full.max-w-full.flex-1.flex-col');
       mainElements.forEach(el => {
@@ -304,10 +228,10 @@
         }
       });
     }
-  
+
     // 绑定按钮点击事件
     toggleBtn.addEventListener('click', toggleSidebar);
-  
+
     // 初始化时确保侧边栏隐藏
     document.addEventListener('DOMContentLoaded', function() {
       const mainElements = document.querySelectorAll('.relative.flex.h-full.max-w-full.flex-1.flex-col');
@@ -315,11 +239,11 @@
         el.style.marginRight = '0px';
       });
     });
-  
-    // —— 3. 核心功能 —— 
+
+    // —— 3. 核心功能 ——
     let detailObserver = null;
     let autoRefreshTimer = null;
-  
+
     /** 等待选择器出现 **/
     function waitFor(selector, timeout = 10000) {
       return new Promise((resolve, reject) => {
@@ -339,33 +263,33 @@
         }, timeout);
       });
     }
-  
+
     /** 清空侧边栏条目 **/
     function clearList() {
       listContainer.innerHTML = '';
     }
-  
+
     /** 构建或重建整个列表 **/
     function rebuildList() {
       clearList();
       const articles = Array.from(
         document.querySelectorAll(SELECTORS.ARTICLE_SELECTOR)
       ).filter((a, idx) => idx % 2 === 0);
-  
+
       articles.forEach((el, idx) => {
         const id = `anchor-msg-${idx+1}`;
         el.id = id;
-  
+
         // 尝试多个文本选择器
         let txtEl = null;
         for (const selector of SELECTORS.TEXT_SELECTORS) {
             txtEl = el.querySelector(selector);
             if (txtEl) break;
         }
-        
+
         let fullText = txtEl ? txtEl.textContent.trim().replace(/\s+/g,' ') : '';
         const preview = fullText.length > 20 ? fullText.slice(0,20) + '…' : fullText;
-  
+
         const a = document.createElement('a');
         a.href        = `#${id}`;
         a.textContent = `${idx+1}. ${preview}`;
@@ -375,7 +299,7 @@
       });
       filterList();
     }
-  
+
     /** 启动自动刷新定时器 **/
     function startAutoRefresh() {
       if (autoRefreshTimer) {
@@ -385,7 +309,7 @@
         rebuildList();
       }, 15000);
     }
-  
+
     /** 停止自动刷新定时器 **/
     function stopAutoRefresh() {
       if (autoRefreshTimer) {
@@ -393,12 +317,12 @@
         autoRefreshTimer = null;
       }
     }
-  
+
     /** 新消息到来时增量追加 **/
     function handleMutations(muts) {
       for (const m of muts) {
         for (const node of m.addedNodes) {
-          if (node.nodeType === 1 && 
+          if (node.nodeType === 1 &&
               (node.matches(SELECTORS.ARTICLE_SELECTOR) ||
                node.querySelector(SELECTORS.ARTICLE_SELECTOR))) {
             rebuildList();
@@ -406,7 +330,7 @@
         }
       }
     }
-  
+
     /** 搜索过滤 **/
     function filterList() {
       const q = searchInput.value.trim();
@@ -418,12 +342,12 @@
     }
     searchInput.addEventListener('input', filterList);
     refreshButton.addEventListener('click', rebuildList);
-  
+
     /** 初始化当前会话 **/
     function initForCurrentSession() {
       if (detailObserver) detailObserver.disconnect();
       stopAutoRefresh();
-  
+
       waitFor(SELECTORS.DETAIL_CONTAINER).then(el => {
         detailObserver = new MutationObserver(handleMutations);
         detailObserver.observe(el, { childList: true, subtree: true });
@@ -439,8 +363,8 @@
         }, 2000);
       });
     }
-  
-    // —— 4. 监听 SPA URL 切换 —— 
+
+    // —— 4. 监听 SPA URL 切换 ——
     (function(history) {
       const push = history.pushState, replace = history.replaceState;
       history.pushState = function(...args) {
@@ -454,11 +378,11 @@
         return ret;
       };
     })(window.history);
-  
+
     window.addEventListener('popstate', () => window.dispatchEvent(new Event('locationchange')));
     window.addEventListener('locationchange', initForCurrentSession);
-  
-    // —— 5. 首次执行 —— 
+
+    // —— 5. 首次执行 ——
     initForCurrentSession();
-  
+
 })();
