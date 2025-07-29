@@ -16,14 +16,7 @@
         /* 针对可能的响应式容器 */
         .container[class*="max-w-"],
         .mx-auto[class*="max-w-"] {
-        max-width: 100% !important;
-        }
-
-        /* 当侧边栏可见时，为主内容区域添加右边距 */
-        body.sidebar-visible div.relative.flex.h-full.max-w-full.flex-1.flex-col,
-        body.sidebar-visible div[class*="relative"][class*="flex"][class*="h-full"][class*="max-w-full"][class*="flex-1"][class*="flex-col"],
-        body.sidebar-visible .max-xs\:\[--force-hide-label\:none\].relative.z-1.flex.h-full.max-w-full.flex-1.flex-col {
-            margin-right: 360px !important;
+            max-width: 100% !important;
         }
 
         /* 侧边栏本身保持固定，但默认隐藏 */
@@ -56,7 +49,7 @@
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            background: #10a37f; /* ChatGPT绿色 */
+            background: #F5F5F5; /* 按钮背景色 */
             color: white;
             display: flex;
             align-items: center;
@@ -77,6 +70,7 @@
             display: flex;
             align-items: center;
             margin-bottom: 10px;
+            border-radius: 4px;
         }
 
         #__chatgpt-anchor-search {
@@ -195,7 +189,7 @@
     // 创建悬浮按钮
     const toggleBtn = document.createElement('div');
     toggleBtn.id = SELECTORS.SIDEBAR.TOGGLE_ID;
-    toggleBtn.innerHTML = '📋';
+    toggleBtn.innerHTML = '🕓';
     toggleBtn.title = '显示/隐藏问题侧边栏';
     document.body.appendChild(toggleBtn);
 
