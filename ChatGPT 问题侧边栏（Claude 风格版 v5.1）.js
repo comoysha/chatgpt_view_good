@@ -432,8 +432,8 @@
 
         allLinks.forEach(link => {
             const searchText = link.getAttribute('data-search-text') || '';
-            const matches = !query || searchText.includes(query);
-            link.style.display = matches ? 'block' : 'none';
+            const matches = !query || query.split(/\s+/).every(word => searchText.includes(word));
+            link.style.setProperty('display', matches ? 'block' : 'none', 'important');
         });
     }
 
